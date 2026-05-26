@@ -56,7 +56,7 @@ JWT_SECRET    = 'dartbid_jwt_secret_change_before_deploy'
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
-# Load DB credentials from db.json (same pattern as Lab 4)
+# Load DB credentials from db.json
 with open('db.json') as f:
     _creds = json.load(f)
 credentials = _creds['localhost']
