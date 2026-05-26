@@ -5,6 +5,8 @@ db.json
 
 # Python
 __pycache__/
+routes/__intit__.py
+utils/__intit__.py
 *.py[cod]
 *$py.class
 .venv/
