@@ -84,11 +84,18 @@ def login():
             return err("Invalid email or password", 401)
 
         student_id, hashed_pw = row
-        if isinstance(hashed_pw, str):
+
+        # Prepared cursors return bytearray; normal return str. Bcrypt needs bytes.
+        if isinstance(hashed_pw, bytearray):
+            hashed_pw = bytes(hashed_pw)
+        elif isinstance(hashed_pw, str):
             hashed_pw = hashed_pw.encode('utf-8')
 
-        if not bcrypt.checkpw(data['password'].encode('utf-8'), hashed_pw):
-            return err("Invalid email or password", 401)
+        try:
+            if not bcrypt.checkpw(data['password'].encode('utf-8'), hashed_pw):
+                return err("Invalid email or password", 401)
+        except ValueError:
+            return err("Database password format is invalid. Check for truncation or incorrect hashing method.", 500)
 
         token = create_token(student_id)
         return ok({"token": token, "studentId": student_id})
