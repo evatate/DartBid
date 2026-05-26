@@ -1,0 +1,29 @@
+# Database & Security
+db.json
+.env
+.flaskenv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+bin/
+lib/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# logs
+*.log
