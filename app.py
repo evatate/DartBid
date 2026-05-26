@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
@@ -49,28 +50,28 @@ Routes:
 '''
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": os.environ.get('ALLOWED_ORIGINS', '*')}})
 
-# JWT config
-JWT_SECRET    = 'dartbid_jwt_secret_change_before_deploy'
+# JWT config - prioritize environment variable for security
+JWT_SECRET    = os.environ.get('JWT_SECRET', 'dartbid_jwt_secret_change_before_deploy')
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
-# Load DB credentials from db.json
-with open('db.json') as f:
-    _creds = json.load(f)
-credentials = _creds['localhost']
-
+# Database configuration from environment variables
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_USER = os.environ.get('DB_USER', 'root')
+DB_PASS = os.environ.get('DB_PASS', '')
+DB_NAME = os.environ.get('DB_NAME', 'dartbid')
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
 def get_db():
     """Open a new mysql.connector connection (dictionary cursor by default)."""
     return mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['user'],
-        password=credentials['password'],
-        database=credentials['database']
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME
     )
 
 
