@@ -52,18 +52,18 @@ Routes:
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": os.environ.get('ALLOWED_ORIGINS', '*')}})
 
-# JWT config - prioritize environment variable for security
-JWT_SECRET    = os.environ.get('JWT_SECRET', 'dartbid_jwt_secret_change_before_deploy')
+# JWT config, prioritize environment variable for security
+JWT_SECRET    = os.environ.get('JWT_SECRET')
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
 # Database configuration from environment variables
-DB_HOST = os.environ.get('DB_HOST', 'localhost')
-DB_USER = os.environ.get('DB_USER', 'root')
-DB_PASS = os.environ.get('DB_PASS', '')
-DB_NAME = os.environ.get('DB_NAME', 'dartbid')
+DB_HOST = os.environ.get('DB_HOST')
+DB_USER = os.environ.get('DB_USER')
+DB_PASS = os.environ.get('DB_PASS')
+DB_NAME = os.environ.get('DB_NAME')
 
-# ── DB helpers ────────────────────────────────────────────────────────────────
+# DB helpers
 
 def get_db():
     """Open a new mysql.connector connection (dictionary cursor by default)."""
@@ -85,7 +85,7 @@ def close_db(cnx, cursor=None):
         except: pass
 
 
-# ── JWT helpers ───────────────────────────────────────────────────────────────
+# JWT helpers
 
 def create_token(student_id):
     payload = {
@@ -99,7 +99,7 @@ def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
 
-# ── Auth decorators ───────────────────────────────────────────────────────────
+# Auth decorators
 
 def login_required(f):
     """Decorator: requires valid JWT in Authorization: Bearer <token> header."""
@@ -119,7 +119,7 @@ def login_required(f):
     return decorated
 
 
-# ── Error handlers ────────────────────────────────────────────────────────────
+# Error handlers
 
 @app.errorhandler(404)
 def not_found(e):
@@ -138,7 +138,7 @@ def health():
     return jsonify({"status": "ok"})
 
 
-# ── Register blueprints ───────────────────────────────────────────────────────
+# Register blueprints
 
 from routes.auth         import auth_bp
 from routes.students     import students_bp

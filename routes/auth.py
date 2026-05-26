@@ -15,7 +15,7 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     """
     Create a new student account.
-    Body: { name, email, password, yearStanding, major? }
+    Body: { name, email, password, yearStanding, major (optional) }
     Each new student gets a $500 simulated starting balance.
     """
     data = request.get_json()
@@ -85,7 +85,6 @@ def login():
 
         student_id, hashed_pw = row
 
-        # Prepared cursors return bytearray; normal return str. Bcrypt needs bytes.
         if isinstance(hashed_pw, bytearray):
             hashed_pw = bytes(hashed_pw)
         elif isinstance(hashed_pw, str):

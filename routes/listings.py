@@ -121,7 +121,7 @@ def get_listing(listing_id):
         if not listing:
             return err("Listing not found", 404)
 
-        # Pending bids — no buyerId (anonymity)
+        # Pending bids, no buyerId (anonymity)
         cursor.execute(
             "SELECT bidId, amount, createdAt FROM bid "
             "WHERE listingId = %s AND status = 'pending' ORDER BY amount DESC",
@@ -129,7 +129,7 @@ def get_listing(listing_id):
         )
         listing['bids'] = cursor.fetchall()
 
-        # Price history — join chain: priceHistory → transaction → listing → section
+        # Price history, join chain: priceHistory → transaction → listing → section
         cursor.execute(
             """
             SELECT ph.price, ph.recordedAt

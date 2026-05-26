@@ -8,7 +8,7 @@ import mysql.connector
 
 
 def get_db():
-    """Import and call app.get_db() — avoids circular imports."""
+    """Import and call app.get_db()."""
     from app import get_db as _get_db
     return _get_db()
 

@@ -127,7 +127,7 @@ def get_ticker():
 @sections_bp.route('/departments', methods=['GET'])
 @login_required
 def get_departments():
-    """All departments — for filter dropdowns."""
+    """All departments for filter dropdowns."""
     cnx = cursor = None
     try:
         cnx = get_db()
@@ -143,7 +143,7 @@ def get_departments():
 @sections_bp.route('/distributives', methods=['GET'])
 @login_required
 def get_distributives():
-    """All distributives — for filter dropdowns."""
+    """All distributives for filter dropdowns."""
     cnx = cursor = None
     try:
         cnx = get_db()

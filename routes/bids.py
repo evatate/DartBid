@@ -106,7 +106,7 @@ def place_bid():
         if float(student['accountBalance']) < amount:
             return err("Insufficient account balance")
 
-        # ── All checks passed — hold funds and insert bid ──────────────────
+        # All checks passed: hold funds and insert bid
         c = cnx.cursor(prepared=True)
         c.execute(
             "UPDATE student SET accountBalance = accountBalance - %s WHERE studentId = %s",
@@ -167,7 +167,7 @@ def accept_bid(bid_id):
       8.  Mark all other pending bids 'outbid' + refund each buyer
       9.  Log accountTransaction (bid_refund) for each losing bidder
       10. Close listing (status = 'completed')
-      11. Append priceHistory (1:1 with transaction — unique constraint enforced in DB)
+      11. Append priceHistory (1:1 with transaction)
       12. Notify buyer (bid_accepted) and seller (payout)
       13. Write audit log entry
 
@@ -208,7 +208,7 @@ def accept_bid(bid_id):
         section_id  = bid['sectionId']
         final_price = float(bid['amount'])
 
-        # Need termId for enrollment insert (unique key: studentId+sectionId+termId)
+        # Need termId for enrollment insert
         cursor.execute(
             "SELECT termId, enrollmentCap FROM section WHERE sectionId = %s", (section_id,)
         )
@@ -218,7 +218,7 @@ def accept_bid(bid_id):
         term_id      = section_row['termId']
         enroll_cap   = section_row['enrollmentCap']
 
-        # ── Begin atomic block ─────────────────────────────────────────────
+        # Begin atomic block
         c = cnx.cursor(prepared=True)
 
         # 1. Transaction record
