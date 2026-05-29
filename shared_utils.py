@@ -1,11 +1,13 @@
 import os
 import mysql.connector
 import jwt
+import datetime
 from functools import wraps
 from flask import request, jsonify
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'test_secret')
 JWT_ALGORITHM = 'HS256'
+JWT_EXP_MINUTES = 120
 
 def get_db():
     return mysql.connector.connect(
@@ -23,6 +25,13 @@ def close_db(cnx, cursor=None):
     if cnx:
         try: cnx.close()
         except: pass
+
+def create_token(student_id):
+    payload = {
+        'student_id': student_id,
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=JWT_EXP_MINUTES)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])

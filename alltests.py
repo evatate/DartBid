@@ -159,7 +159,6 @@ def suite_auth():
         "password": "secret99", "yearStanding": "senior"
     })
     check("Register valid student → 201", r.status_code == 201)
-    tok = r.json()["data"]["token"]
     try:
         data = r.json()
         tok = data["data"]["token"]

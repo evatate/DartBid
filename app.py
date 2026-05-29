@@ -7,7 +7,7 @@ import bcrypt
 import jwt
 import datetime
 from functools import wraps
-from shared_utils import get_db, close_db, login_required
+from shared_utils import get_db, close_db, login_required, create_token
 
 '''
 DartBid API using Flask + JWT
@@ -57,27 +57,9 @@ allowed_origins = os.environ.get('ALLOWED_ORIGINS')
 origins_list = [o.strip() for o in allowed_origins.split(',')] if allowed_origins else []
 CORS(app, resources={r"/api/*": {"origins": origins_list}})
 
-# JWT config, prioritize environment variable for security
-JWT_SECRET    = os.environ.get('JWT_SECRET')
-JWT_ALGORITHM = 'HS256'
-JWT_EXP_MINUTES = 120
-
 # Environment variable validation
-if not JWT_SECRET:
+if not os.environ.get('JWT_SECRET'):
     app.logger.error("JWT_SECRET is not set in environment variables!")
-
-# JWT helpers
-
-def create_token(student_id):
-    payload = {
-        'student_id': student_id,
-        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=JWT_EXP_MINUTES)
-    }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-
-
-def decode_token(token):
-    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
 
 # Error handlers
