@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 import bcrypt
-from app import get_db, close_db, create_token
+from shared_utils import get_db, close_db
+from app import create_token
 from db_helpers import ok, err, is_duplicate
 
 '''

@@ -7,6 +7,7 @@ import bcrypt
 import jwt
 import datetime
 from functools import wraps
+from shared_utils import get_db, close_db, login_required
 
 '''
 DartBid API using Flask + JWT
@@ -61,35 +62,9 @@ JWT_SECRET    = os.environ.get('JWT_SECRET')
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
-# Database configuration from environment variables
-DB_HOST = os.environ.get('DB_HOST')
-DB_USER = os.environ.get('DB_USER')
-DB_PASS = os.environ.get('DB_PASS')
-DB_NAME = os.environ.get('DB_NAME')
-DB_PORT = os.environ.get('DB_PORT', '3306')
-
-# DB helpers
-
-def get_db():
-    """Open a new mysql.connector connection (dictionary cursor by default)."""
-    return mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASS,
-        database=DB_NAME,
-        port=int(DB_PORT)
-    )
-
-
-def close_db(cnx, cursor=None):
-    """Safely close cursor and connection."""
-    if cursor:
-        try: cursor.close()
-        except: pass
-    if cnx:
-        try: cnx.close()
-        except: pass
-
+# Environment variable validation
+if not JWT_SECRET:
+    app.logger.error("JWT_SECRET is not set in environment variables!")
 
 # JWT helpers
 
@@ -103,26 +78,6 @@ def create_token(student_id):
 
 def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-
-
-# Auth decorators
-
-def login_required(f):
-    """Decorator: requires valid JWT in Authorization: Bearer <token> header."""
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.headers.get('Authorization', '')
-        if not auth.startswith('Bearer '):
-            return jsonify({"error": "Missing or invalid token"}), 401
-        try:
-            payload = decode_token(auth.split(' ')[1])
-            request.student_id = payload['student_id']
-        except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token expired"}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token"}), 401
-        return f(*args, **kwargs)
-    return decorated
 
 
 # Error handlers

@@ -160,6 +160,13 @@ def suite_auth():
     })
     check("Register valid student → 201", r.status_code == 201)
     tok = r.json()["data"]["token"]
+    try:
+        data = r.json()
+        tok = data["data"]["token"]
+    except Exception:
+        print(f"{RED}Critical Failure: Server returned non-JSON response.{RESET}")
+        print(f"Response text: {r.text[:500]}") # Print first 500 chars of error
+        sys.exit(1)
     check("Register returns token", bool(tok))
 
     # 1.4 Duplicate email
