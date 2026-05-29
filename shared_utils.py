@@ -10,13 +10,20 @@ JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
 def get_db():
-    return mysql.connector.connect(
-        host=os.environ.get('DB_HOST'),
-        user=os.environ.get('DB_USER'),
-        password=os.environ.get('DB_PASS'),
-        database=os.environ.get('DB_NAME'),
-        port=int(os.environ.get('DB_PORT', '3306'))
-    )
+    try:
+        port_val = os.environ.get('DB_PORT', '3306')
+        port = int(port_val) if port_val and port_val.strip() else 3306
+        
+        return mysql.connector.connect(
+            host=os.environ.get('DB_HOST'),
+            user=os.environ.get('DB_USER'),
+            password=os.environ.get('DB_PASS'),
+            database=os.environ.get('DB_NAME'),
+            port=port,
+            connection_timeout=15  # Fail after 15s instead of hanging
+        )
+    except Exception as e:
+        raise RuntimeError(f"Database connection failed: {str(e)}")
 
 def close_db(cnx, cursor=None):
     if cursor:

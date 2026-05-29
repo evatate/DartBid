@@ -28,9 +28,11 @@ def register():
 
     valid_years = ('freshman', 'sophomore', 'junior', 'senior')
     if data['yearStanding'] not in valid_years:
-        return err(f"yearStanding must be one of: {', '.join(valid_years)}")
+        if data['yearStanding'] not in valid_years:
+            return err(f"yearStanding must be one of: {', '.join(valid_years)}")
 
-    hashed = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+    # Using 10 rounds to prevent timeouts on slow Free Tier CPUs
+    hashed = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt(10))
 
     cnx = cursor = None
     try:
@@ -53,7 +55,7 @@ def register():
         return ok({"studentId": student_id, "token": token}, "Account created", 201)
 
     except Exception as e:
-        if cnx: cnx.rollback()
+        if cnx and cnx.is_connected(): cnx.rollback()
         if is_duplicate(e):
             return err("Email already registered", 409)
         return err(str(e), 500)
