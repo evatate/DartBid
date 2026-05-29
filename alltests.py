@@ -310,8 +310,11 @@ def suite_browse():
 
     # 3.6 Section detail (seeded section 1 = COSC 61)
     r = api("get", "/sections/1", token=tok)
-    check("GET /sections/1 → 200", r.status_code == 200)
-    s = r.json()["data"]
+    if not check("GET /sections/1 → 200", r.status_code == 200):
+        print(f"    {YELLOW}Skipping section detail tests: section 1 not found. Ensure setup.sql was run.{RESET}")
+        return
+    
+    s = r.json().get("data", {})
     for field in ["sectionId", "courseCode", "title", "professorName",
                   "meetingTime", "enrollmentCap", "currentEnrollment",
                   "priceHistory", "activeListing", "termName",
@@ -845,9 +848,12 @@ def suite_expire():
     # We now use the CRON_SECRET header instead of a student token
     cron_headers = {"X-Cron-Key": os.environ.get('CRON_SECRET', 'test_secret')}
     r = api("post", "/listings/expire-all", headers=cron_headers)
-    check("POST /listings/expire-all → 200", r.status_code == 200)
-    data = r.json()["data"]
-    check("expire-all returns 'expired' count", "expired" in data)
+    if check("POST /listings/expire-all → 200", r.status_code == 200):
+        data = r.json().get("data", {})
+        check("expire-all returns 'expired' count", "expired" in data)
+    else:
+        err_msg = r.json().get("error", "Unknown error")
+        print(f"    {RED}Expire-all failed: {err_msg}{RESET}")
 
     # 8.1 No token → 401
     r = api("post", "/listings/expire-all")

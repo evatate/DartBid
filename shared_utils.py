@@ -5,7 +5,7 @@ import datetime
 from functools import wraps
 from flask import request, jsonify
 
-JWT_SECRET = os.environ.get('JWT_SECRET', 'test_secret')
+JWT_SECRET = os.environ.get('JWT_SECRET')
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_MINUTES = 120
 
