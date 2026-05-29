@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, request, current_app
-from app import get_db, close_db
+from app import get_db, close_db, login_required
 from db_helpers import ok, err
 
 '''
