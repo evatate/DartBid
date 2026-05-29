@@ -53,7 +53,7 @@ app = Flask(__name__)
 
 # Only allow specific websites defined in .env
 allowed_origins = os.environ.get('ALLOWED_ORIGINS')
-origins_list = allowed_origins.split(',') if allowed_origins else []
+origins_list = [o.strip() for o in allowed_origins.split(',')] if allowed_origins else []
 CORS(app, resources={r"/api/*": {"origins": origins_list}})
 
 # JWT config, prioritize environment variable for security
@@ -96,7 +96,7 @@ def close_db(cnx, cursor=None):
 def create_token(student_id):
     payload = {
         'student_id': student_id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=JWT_EXP_MINUTES)
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=JWT_EXP_MINUTES)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
@@ -137,7 +137,11 @@ def method_not_allowed(e):
 
 @app.route('/')
 def home():
-    return jsonify({"message": "DartBid API is running!"})
+    return jsonify({
+        "message": "DartBid API is running!",
+        "status": "healthy",
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    })
 
 @app.route('/api/health')
 def health():

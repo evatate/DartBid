@@ -26,7 +26,7 @@ import time
 import json
 import os
 
-BASE = "http://localhost:8080/api"
+BASE = os.environ.get("API_BASE_URL", "http://localhost:8080/api")
 
 # ── Colour output ─────────────────────────────────────────────────────────────
 GREEN  = "\033[92m"
