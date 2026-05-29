@@ -1,5 +1,6 @@
-from flask import Blueprint, request
-from app import get_db, close_db, login_required
+import os
+from flask import Blueprint, request, current_app
+from app import get_db, close_db
 from db_helpers import ok, err
 
 '''
@@ -324,13 +325,20 @@ def cancel_listing(listing_id):
 
 
 @listings_bp.route('/expire-all', methods=['POST'])
-@login_required
 def expire_all():
     """
     Expire all listings whose expiresAt has passed and status is still 'active'.
     Refunds all pending bids. Call this from a cron job every minute.
-    In production, protect this endpoint (e.g. shared secret header).
     """
+    # Protect with a system secret instead of user login
+    cron_key = request.headers.get('X-Cron-Key')
+    expected_key = os.environ.get('CRON_SECRET')
+    
+    # Block the request if the secret is missing or wrong
+    if not expected_key or cron_key != expected_key:
+        current_app.logger.warning(f"Unauthorized cron attempt from {request.remote_addr}")
+        return err("Unauthorized", 401)
+
     cnx = cursor = None
     try:
         cnx = get_db()

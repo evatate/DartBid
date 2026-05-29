@@ -50,7 +50,11 @@ Routes:
 '''
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": os.environ.get('ALLOWED_ORIGINS', '*')}})
+
+# Only allow specific websites defined in .env
+allowed_origins = os.environ.get('ALLOWED_ORIGINS')
+origins_list = allowed_origins.split(',') if allowed_origins else []
+CORS(app, resources={r"/api/*": {"origins": origins_list}})
 
 # JWT config, prioritize environment variable for security
 JWT_SECRET    = os.environ.get('JWT_SECRET')
@@ -156,4 +160,5 @@ app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(debug=True, host='0.0.0.0', port=port)
