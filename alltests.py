@@ -24,6 +24,7 @@ import requests
 import sys
 import time
 import json
+import os
 
 BASE = "http://localhost:8080/api"
 
@@ -835,7 +836,9 @@ def suite_expire():
     # We can't easily create a listing with a past expiresAt through the API
     # (the server caps it to addDropEnd which is in the future).
     # Test the expire-all endpoint itself and its 200 response:
-    r = api("post", "/listings/expire-all", token=seller_tok)
+    # We now use the CRON_SECRET header instead of a student token
+    cron_headers = {"X-Cron-Key": os.environ.get('CRON_SECRET', 'test_secret')}
+    r = api("post", "/listings/expire-all", headers=cron_headers)
     check("POST /listings/expire-all → 200", r.status_code == 200)
     data = r.json()["data"]
     check("expire-all returns 'expired' count", "expired" in data)
