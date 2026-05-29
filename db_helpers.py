@@ -8,13 +8,13 @@ import mysql.connector
 
 
 def get_db():
-    """Import and call app.get_db()."""
-    from app import get_db as _get_db
+    """Import and call shared_utils.get_db()."""
+    from shared_utils import get_db as _get_db
     return _get_db()
 
 
 def close_db(cnx, cursor=None):
-    from app import close_db as _close_db
+    from shared_utils import close_db as _close_db
     _close_db(cnx, cursor)
 
 

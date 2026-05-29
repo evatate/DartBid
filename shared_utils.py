@@ -12,7 +12,10 @@ JWT_EXP_MINUTES = 120
 def get_db():
     try:
         port_val = os.environ.get('DB_PORT', '3306')
-        port = int(port_val) if port_val and port_val.strip() else 3306
+        try:
+            port = int(port_val)
+        except (ValueError, TypeError):
+            port = 3306
         
         return mysql.connector.connect(
             host=os.environ.get('DB_HOST'),

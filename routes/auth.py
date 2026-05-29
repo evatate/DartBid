@@ -28,8 +28,7 @@ def register():
 
     valid_years = ('freshman', 'sophomore', 'junior', 'senior')
     if data['yearStanding'] not in valid_years:
-        if data['yearStanding'] not in valid_years:
-            return err(f"yearStanding must be one of: {', '.join(valid_years)}")
+        return err(f"yearStanding must be one of: {', '.join(valid_years)}")
 
     # Using 10 rounds to prevent timeouts on slow Free Tier CPUs
     hashed = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt(10))
