@@ -55,22 +55,24 @@ def check(label, condition, got=None, note=""):
     if condition:
         passed += 1
         print(f"  {GREEN}✓{RESET}  {label}")
+        return True
     else:
         failed += 1
         detail = f" (got {got})" if got is not None else ""
         extra  = f" — {note}"   if note              else ""
         print(f"  {RED}✗{RESET}  {label}{detail}{extra}")
+        return False
 
 
 def check_field(label, data, field, expected=None):
     """Assert a field exists in a dict, and optionally equals expected."""
     if field not in data:
         check(label, False, note=f"field '{field}' missing from response")
-        return
+        return False
     if expected is not None:
-        check(label, data[field] == expected, got=data[field])
+        return check(label, data[field] == expected, got=data[field])
     else:
-        check(label, True)
+        return check(label, True)
 
 
 def api(method, path, token=None, **kwargs):
