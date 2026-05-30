@@ -25,6 +25,11 @@ import sys
 import time
 import json
 import os
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 BASE = os.environ.get("API_BASE_URL", "http://localhost:8080/api")
 
@@ -846,7 +851,12 @@ def suite_expire():
     # (the server caps it to addDropEnd which is in the future).
     # Test the expire-all endpoint itself and its 200 response:
     # We now use the CRON_SECRET header instead of a student token
-    cron_headers = {"X-Cron-Key": os.environ.get('CRON_SECRET', 'test_secret')}
+    secret = os.environ.get('CRON_SECRET')
+    if not secret:
+        print(f"    {YELLOW}Warning: CRON_SECRET not found in environment. Defaulting to 'test_secret'.{RESET}")
+        secret = 'test_secret'
+        
+    cron_headers = {"X-Cron-Key": secret}
     r = api("post", "/listings/expire-all", headers=cron_headers)
     if check("POST /listings/expire-all → 200", r.status_code == 200):
         data = r.json().get("data", {})
